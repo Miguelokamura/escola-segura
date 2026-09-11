@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EscolaSegura</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  {% if session.get('admin') %}
+  <nav>
+    <span class="logo">🏫 EscolaSegura</span>
+    <div>
+      <a href="/">Dashboard</a>
+      <a href="/alunos">Alunos</a>
+      <a href="/scanner">Scanner</a>
+      <a href="/registros">Registros</a>
+      <a href="/logout">Sair</a>
+    </div>
+  </nav>
+  {% endif %}
+  <main>{% block conteudo %}{% endblock %}</main>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

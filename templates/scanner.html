@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<h1>📷 Controle de Acesso</h1>
+<div class="card scanner-box">
+  <p>Aponte a câmera para o QR Code do aluno</p>
+  <div id="leitor"></div>
+  <div id="resultado" class="oculto"></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+const res = document.getElementById("resultado");
+
+function mostrar(ok, msg) {
+  res.classList.remove("oculto", "sucesso-bg", "falha-bg");
+  res.classList.add(ok ? "sucesso-bg" : "falha-bg");
+  res.textContent = msg;
+  try { new Audio(ok
+    ? "https://actions.google.com/sounds/v1/cartoons/pling.ogg"
+    : "https://actions.google.com/sounds/v1/cartoons/bugle_tune.ogg").play();
+  } catch (e) {}
+  setTimeout(() => res.classList.add("oculto"), 4000);
+}
+
+const scanner = new Html5Qrcode("leitor");
+scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
+  async (texto) => {
+    await scanner.pause(true);
+    const r = await fetch("/api/validar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: texto })
+    }).then(x => x.json());
+    mostrar(r.ok, r.msg);
+    setTimeout(() => scanner.resume(), 2500);
+  }
+).catch(() => {
+  document.getElementById("leitor").innerHTML =
+    "<p class='erro'>Câmera não acessada. Verifique a permissão do navegador.</p>";
+});
+</script>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<div class="card login-box">
+  <h2>🔐 EscolaSegura</h2>
+  {% if erro %}<p class="erro">{{ erro }}</p>{% endif %}
+  <form method="POST">
+    <input name="usuario" placeholder="Usuário" required>
+    <input name="senha" type="password" placeholder="Senha" required>
+    <button type="submit">Entrar</button>
+  </form>
+</div>
+{% endblock %}

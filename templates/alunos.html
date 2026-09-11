@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<h1>👨‍🎓 Gestão de Alunos</h1>
+<div class="card">
+  <h3 id="titulo-form">Novo Aluno</h3>
+  <form id="form-aluno">
+    <input type="hidden" id="aluno-id">
+    <input id="f-nome" placeholder="Nome completo" required>
+    <input id="f-matricula" placeholder="Matrícula" required>
+    <input id="f-turma" placeholder="Turma">
+    <input id="f-responsavel" placeholder="Responsável">
+    <input id="f-telefone" placeholder="Telefone">
+    <button type="submit">Salvar</button>
+    <button type="button" id="btn-cancelar" hidden>Cancelar</button>
+  </form>
+</div>
+<h2>Alunos cadastrados</h2>
+<table id="tabela-alunos">
+  <tr><th>Nome</th><th>Matrícula</th><th>Turma</th>
+      <th>Status</th><th>QR Code</th><th>Ações</th></tr>
+</table>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/app.js"></script>
+<script>carregarAlunos();</script>
+{% endblock %}
