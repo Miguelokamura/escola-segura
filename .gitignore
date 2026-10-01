@@ -1,0 +1,5 @@
+react/node_modules/
+react/mobile/node_modules/
+react/mobile/node_modules/
+react/client/dist/
+react/server/.env

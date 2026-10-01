@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "EscolaSegura",
+    "slug": "escola-segura",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#b91c1c",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      }
+    },
+    "plugins": [["expo-camera", { "cameraPermission": "Permita o acesso à câmera para ler o QR Code do aluno." }]],
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}

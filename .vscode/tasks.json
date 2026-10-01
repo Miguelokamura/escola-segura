@@ -1,0 +1,41 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Python: iniciar Flask",
+      "type": "shell",
+      "command": "${workspaceFolder}\\venv\\Scripts\\python.exe",
+      "args": ["app.py"],
+      "options": { "cwd": "${workspaceFolder}\\python" },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "React: iniciar API",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "dev:server"],
+      "options": { "cwd": "${workspaceFolder}\\react" },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "React: iniciar interface",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "dev:client"],
+      "options": { "cwd": "${workspaceFolder}\\react" },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Expo: iniciar app no celular",
+      "type": "shell",
+      "command": "npm",
+      "args": ["start", "--", "--clear"],
+      "options": { "cwd": "${workspaceFolder}\\react\\mobile" },
+      "isBackground": true,
+      "problemMatcher": []
+    }
+  ]
+}

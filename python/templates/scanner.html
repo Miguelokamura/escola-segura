@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<h1>📷 Controle de Acesso</h1>
+<div class="card scanner-box">
+  <p>Aponte a câmera para o QR Code do aluno</p>
+  <video id="camera" autoplay playsinline muted></video>
+  <p id="scanner-status" class="dica" role="status">Iniciando câmera…</p>
+  <div id="resultado" class="oculto"></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const res = document.getElementById("resultado");
+const video = document.getElementById("camera");
+const statusEl = document.getElementById("scanner-status");
+let processando = false;
+
+function mostrar(ok, msg, status) {
+  res.classList.remove("oculto", "sucesso-bg", "falha-bg", "atraso-bg");
+  res.classList.add(status === "ATRASADO" ? "atraso-bg" : (ok ? "sucesso-bg" : "falha-bg"));
+  res.textContent = msg;
+  try { new Audio(status === "ATRASADO"
+    ? "https://actions.google.com/sounds/v1/alarms/beep_short.ogg"
+    : (ok ? "https://actions.google.com/sounds/v1/cartoons/pling.ogg"
+    : "https://actions.google.com/sounds/v1/cartoons/bugle_tune.ogg")).play();
+  } catch (e) {}
+  setTimeout(() => res.classList.add("oculto"), 4000);
+}
+
+async function validar(texto) {
+  if (processando) return;
+  processando = true;
+  statusEl.textContent = "QR Code lido. Validando…";
+  try {
+    const resposta = await fetch("/api/validar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: texto })
+    });
+    const r = await resposta.json();
+    mostrar(r.ok, r.msg || "Validação concluída.", r.status);
+    statusEl.textContent = "Câmera ativa. Pronto para a próxima leitura.";
+  } catch (e) {
+    mostrar(false, "Falha ao validar. Confira a conexão com o servidor e tente novamente.");
+    statusEl.textContent = "Câmera ativa, mas o servidor não respondeu.";
+  } finally {
+    setTimeout(() => { processando = false; }, 1800);
+  }
+}
+
+async function iniciarScanner() {
+  if (!navigator.mediaDevices?.getUserMedia) {
+    statusEl.textContent = "O navegador bloqueou a câmera. Abra o sistema em localhost ou por HTTPS e permita o acesso à câmera.";
+    return;
+  }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: "environment" } }, audio: false
+    });
+    video.srcObject = stream;
+    await video.play();
+
+    if ("BarcodeDetector" in window) {
+      const detector = new BarcodeDetector({ formats: ["qr_code"] });
+      statusEl.textContent = "Câmera ativa. Aponte para o QR Code.";
+      const procurar = async () => {
+        if (!video.srcObject) return;
+        try {
+          if (!processando && video.readyState >= 2) {
+            const codigos = await detector.detect(video);
+            if (codigos.length) await validar(codigos[0].rawValue);
+          }
+        } catch (e) {}
+        requestAnimationFrame(procurar);
+      };
+      procurar();
+    } else {
+      // Compatibilidade: carrega o leitor externo apenas em navegadores sem BarcodeDetector.
+      const script = document.createElement("script");
+      script.src = "https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js";
+      script.onload = () => {
+        video.srcObject.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+        video.hidden = true;
+        const leitor = document.createElement("div");
+        leitor.id = "leitor";
+        video.after(leitor);
+        const scanner = new Html5Qrcode("leitor");
+        scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, validar)
+          .then(() => { statusEl.textContent = "Câmera ativa. Aponte para o QR Code."; })
+          .catch(() => { statusEl.textContent = "Não foi possível iniciar a câmera. Verifique a permissão e use localhost ou HTTPS."; });
+      };
+      script.onerror = () => {
+        statusEl.textContent = "Este navegador não tem leitor de QR integrado e a biblioteca externa não carregou. Verifique a internet.";
+      };
+      document.head.appendChild(script);
+    }
+  } catch (e) {
+    const motivo = e.name === "NotAllowedError" ? "Permita o acesso à câmera nas configurações do navegador." :
+      e.name === "NotFoundError" ? "Nenhuma câmera foi encontrada neste dispositivo." :
+      "A câmera exige localhost ou uma conexão HTTPS segura.";
+    statusEl.textContent = motivo;
+  }
+}
+
+iniciarScanner();
+</script>
+{% endblock %}

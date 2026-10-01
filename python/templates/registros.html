@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<h1>📜 Histórico de Acessos</h1>
+<button onclick="carregar()">🔄 Atualizar</button>
+<p class="dica">Atualiza automaticamente a cada 10 segundos.</p>
+<table id="tabela-registros">
+  <tr><th>Aluno</th><th>Turma</th><th>Tipo</th><th>Método</th>
+      <th>Status</th><th>Atraso</th><th>Data/Hora</th></tr>
+</table>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/app.js"></script>
+<script>
+carregar();
+setInterval(carregar, 10000);
+</script>
+{% endblock %}

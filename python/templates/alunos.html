@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<h1>👨‍🎓 Gestão de Alunos</h1>
+<div class="card">
+  <h3 id="titulo-form">Novo Aluno</h3>
+  <p class="dica">Os campos marcados com * são obrigatórios.</p>
+  <div id="mensagem-aluno" class="mensagem oculto" role="status" aria-live="polite"></div>
+  <form id="form-aluno">
+    <input type="hidden" id="aluno-id">
+    <label for="f-nome">Nome completo *</label>
+    <input id="f-nome" placeholder="Nome completo" minlength="3" maxlength="120" required>
+    <label for="f-matricula">Matrícula *</label>
+    <input id="f-matricula" placeholder="Matrícula" maxlength="30" required>
+    <label for="f-turma">Turma</label>
+    <input id="f-turma" placeholder="Turma" maxlength="60">
+    <label for="f-responsavel">Responsável</label>
+    <input id="f-responsavel" placeholder="Nome do responsável" maxlength="120">
+    <label for="f-telefone">Telefone</label>
+    <input id="f-telefone" type="tel" placeholder="(00) 00000-0000" maxlength="20">
+    <button type="submit">Salvar</button>
+    <button type="button" id="btn-cancelar" hidden>Cancelar</button>
+  </form>
+</div>
+<h2>Alunos cadastrados</h2>
+<table id="tabela-alunos">
+  <tr><th>Nome</th><th>Matrícula</th><th>Turma</th>
+      <th>Status</th><th>QR Code</th><th>Ações</th></tr>
+</table>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/app.js"></script>
+<script>carregarAlunos();</script>
+{% endblock %}
