@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # EscolaSegura
 
 O projeto está separado em duas aplicações independentes:
@@ -45,3 +46,6 @@ Para facilitar o desenvolvimento, o login React também aceita as credenciais vi
 - Senha: `admin123`
 
 Edite esse arquivo e reinicie a tarefa **React: iniciar API** para trocar os valores.
+=======
+Sistema de segurança
+>>>>>>> c4957d8eb62304e5f0ce80e7754ec738364f447d
