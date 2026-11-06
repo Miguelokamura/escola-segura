@@ -1,35 +1,31 @@
 # -*- coding: utf-8 -*-
 """Redefine a senha do admin gravando um hash válido no banco."""
+from getpass import getpass
+
 import mysql.connector
 from werkzeug.security import generate_password_hash
 from config import DB_CONFIG
 
-SENHA_NOVA = "admin1234"   # ← defina aqui a senha que quiser
+USUARIO = input("Usuário do administrador: ").strip()
+SENHA_NOVA = getpass("Nova senha: ")
+if not USUARIO or not SENHA_NOVA:
+    raise SystemExit("Usuário e senha são obrigatórios.")
 
 db = mysql.connector.connect(**DB_CONFIG)
 cur = db.cursor()
 
 hash_novo = generate_password_hash(SENHA_NOVA)
-print("Novo hash gerado:")
-print(hash_novo)
-print()
-
-cur.execute("UPDATE administradores SET senha_hash=%s WHERE usuario=%s",
-            (hash_novo, "admin"))
-
-if cur.rowcount == 0:
-    # admin não existia -> cria agora
-    cur.execute("INSERT INTO administradores (usuario, senha_hash) VALUES (%s,%s)",
-                ("admin", hash_novo))
-    print("✔ Admin criado!")
-
-db.commit()
-
-# Confirma o que ficou gravado
-cur.execute("SELECT usuario, senha_hash FROM administradores")
-for usuario, hash_gravado in cur.fetchall():
-    print(f"✔ {usuario} -> {hash_gravado}")
-
-cur.close()
-db.close()
-print(f"\n✅ Pronto! Login: admin | Senha: {SENHA_NOVA}")
+try:
+    cur.execute("UPDATE administradores SET senha_hash=%s WHERE usuario=%s",
+                (hash_novo, USUARIO))
+    if cur.rowcount == 0:
+        cur.execute("INSERT INTO administradores (usuario, senha_hash) VALUES (%s,%s)",
+                    (USUARIO, hash_novo))
+    db.commit()
+    print("Senha do administrador atualizada.")
+except Exception:
+    db.rollback()
+    raise
+finally:
+    cur.close()
+    db.close()

@@ -15,9 +15,9 @@ async function api(path, options = {}) {
 const Button = ({ children, onPress, secondary }) => <Pressable onPress={onPress} style={[styles.button, secondary && styles.secondary]}><Text style={[styles.buttonText, secondary && styles.secondaryText]}>{children}</Text></Pressable>;
 
 function Login({ onLogin }) {
-  const [usuario, setUsuario] = useState("admin"), [senha, setSenha] = useState("admin1234"), [erro, setErro] = useState("");
+  const [usuario, setUsuario] = useState(""), [senha, setSenha] = useState(""), [erro, setErro] = useState("");
   async function entrar() { try { setErro(""); const resposta = await api("/mobile-login", { method: "POST", body: JSON.stringify({ usuario, senha }) }); chaveMobile = resposta.chaveMobile; onLogin(); } catch (e) { setErro(e.message); } }
-  return <SafeAreaView style={styles.login}><View style={styles.loginCard}><Text style={styles.brand}>🏫 EscolaSegura</Text><Text style={styles.subtitle}>Controle de acesso escolar</Text><TextInput style={styles.input} value={usuario} onChangeText={setUsuario} placeholder="Usuário" autoCapitalize="none" /><TextInput style={styles.input} value={senha} onChangeText={setSenha} placeholder="Senha" secureTextEntry /><Text style={styles.error}>{erro}</Text><Button onPress={entrar}>Entrar</Button><Text style={styles.helper}>Credenciais: react/server/credentials.js</Text></View></SafeAreaView>;
+  return <SafeAreaView style={styles.login}><View style={styles.loginCard}><Text style={styles.brand}>🏫 EscolaSegura</Text><Text style={styles.subtitle}>Controle de acesso escolar</Text><TextInput style={styles.input} value={usuario} onChangeText={setUsuario} placeholder="Usuário" autoCapitalize="none" /><TextInput style={styles.input} value={senha} onChangeText={setSenha} placeholder="Senha" secureTextEntry /><Text style={styles.error}>{erro}</Text><Button onPress={entrar}>Entrar</Button><Text style={styles.helper}>As credenciais devem ser configuradas na API.</Text></View></SafeAreaView>;
 }
 const AccessRow = ({ item }) => <View style={styles.row}><View><Text style={styles.rowTitle}>{item.nome}</Text><Text>{item.tipo} • {item.dh || item.data_hora}</Text></View><Text style={item.status === "AUTORIZADO" ? styles.ok : styles.denied}>{item.status}</Text></View>;
 

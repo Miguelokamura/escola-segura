@@ -1,9 +1,6 @@
-// Credenciais locais para desenvolvimento.
-// Altere os dois valores abaixo e reinicie a API React para aplicar a mudança.
-// Não use este arquivo com senha em texto puro em produção.
+// As credenciais do app móvel são opcionais e devem ser configuradas no ambiente.
 export const localAdmin = {
-  usuario: "admin",
-  senha: "admin1234",
-  // Chave usada apenas pelo app Expo após o login. Troque junto com a senha.
-  chaveMobile: "admn1234",
+  usuario: process.env.MOBILE_ADMIN_USER || "",
+  senha: process.env.MOBILE_ADMIN_PASSWORD || "",
+  chaveMobile: process.env.MOBILE_API_KEY || "",
 };

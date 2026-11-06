@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<div class="dashboard-heading">
+  <div><h1>{{ turma_selecionada or "Minhas turmas" }}</h1><p>Olá, {{ professor.nome }}. Presença atualizada automaticamente.</p></div>
+</div>
+<div class="teacher-summary">
+  <section class="card"><span>Presentes</span><strong id="total-presentes">0</strong></section>
+  <section class="card"><span>Chegaram atrasados</span><strong id="total-atrasados">0</strong></section>
+  <section class="card"><span>Sem entrada registrada</span><strong id="total-nao-chegaram">0</strong></section>
+</div>
+<section class="card teacher-list">
+  <div class="list-heading"><div><h2>Alunos de hoje</h2><p id="total-alunos"></p></div></div>
+  <p id="erro-presencas" class="erro" role="alert" hidden></p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Aluno</th><th>Turma</th><th>Presença</th><th>Entrada</th><th>Saída</th></tr></thead>
+    <tbody id="tabela-presencas"><tr><td class="empty-state" colspan="5">Carregando presenças…</td></tr></tbody>
+  </table></div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/professor.js"></script>
+{% endblock %}

@@ -1,11 +1,31 @@
 {% extends "base.html" %}
 {% block conteudo %}
 <h1>📷 Controle de Acesso</h1>
-<div class="card scanner-box">
-  <p>Aponte a câmera para o QR Code do aluno</p>
-  <video id="camera" autoplay playsinline muted></video>
-  <p id="scanner-status" class="dica" role="status">Iniciando câmera…</p>
-  <div id="resultado" class="oculto"></div>
+<div class="scanner-layout">
+  <section class="card scanner-box">
+    <p>Aponte a câmera para o QR Code do aluno</p>
+    <video id="camera" autoplay playsinline muted></video>
+    <p id="scanner-status" class="scanner-camera-hint" role="status">Iniciando câmera…</p>
+  </section>
+  <aside class="card scanner-details" aria-live="polite">
+    <span class="form-kicker">ÚLTIMA LEITURA</span>
+    <h2>Dados do acesso</h2>
+    <dl>
+      <div><dt>Aluno</dt><dd id="scan-aluno">Aguardando leitura</dd></div>
+      <div><dt>Turma</dt><dd id="scan-turma">—</dd></div>
+      <div><dt>Movimento</dt><dd id="scan-tipo">—</dd></div>
+      <div><dt>Status</dt><dd id="scan-status" class="scanner-muted">Aguardando QR Code</dd></div>
+    </dl>
+    <div id="resultado" class="scanner-message oculto"></div>
+    <form id="justificativa-form" class="justification-form oculto">
+      <label for="justificativa-texto">Justificativa <span>*</span></label>
+      <textarea id="justificativa-texto" rows="4" maxlength="500" placeholder="Explique o motivo da tentativa antes de completar 1 hora." required></textarea>
+      <small>Até 500 caracteres. O registro continuará como negado.</small>
+      <p id="justificativa-erro" class="erro oculto" role="alert"></p>
+      <button id="justificativa-enviar" type="submit">Salvar justificativa</button>
+    </form>
+    <p id="justificativa-salva" class="justification-saved oculto" role="status">Justificativa registrada.</p>
+  </aside>
 </div>
 {% endblock %}
 {% block scripts %}
@@ -14,14 +34,33 @@ const res = document.getElementById("resultado");
 const video = document.getElementById("camera");
 const statusEl = document.getElementById("scanner-status");
 let processando = false;
+let aguardandoJustificativa = false;
+let registroJustificativa = null;
+const formularioJustificativa = document.getElementById("justificativa-form");
 
-function mostrar(ok, msg, status) {
+function mostrar(r) {
+  const status = r.status || (r.ok ? "AUTORIZADO" : "NEGADO");
+  const aluno = r.aluno || {};
+  const tipo = r.tipo || "";
+  const classe = status === "ATRASADO" ? "atraso-bg" : (r.ok ? "sucesso-bg" : "falha-bg");
+  document.getElementById("scan-aluno").textContent = aluno.nome || "QR Code não reconhecido";
+  document.getElementById("scan-turma").textContent = aluno.turma || "—";
+  document.getElementById("scan-tipo").textContent = tipo === "ENTRADA" ? "Entrada" : (tipo === "SAIDA" ? "Saída" : "—");
+  const statusEl = document.getElementById("scan-status");
+  statusEl.textContent = status;
+  statusEl.className = status === "ATRASADO" ? "laranja" : (r.ok ? "verde" : "vermelho");
   res.classList.remove("oculto", "sucesso-bg", "falha-bg", "atraso-bg");
-  res.classList.add(status === "ATRASADO" ? "atraso-bg" : (ok ? "sucesso-bg" : "falha-bg"));
-  res.textContent = msg;
+  res.classList.add(classe);
+  res.textContent = r.msg || "Leitura concluída.";
+  aguardandoJustificativa = Boolean(r.solicitar_justificativa);
+  registroJustificativa = r.registro_id || null;
+  formularioJustificativa.classList.toggle("oculto", !aguardandoJustificativa);
+  document.getElementById("justificativa-salva").classList.add("oculto");
+  document.getElementById("justificativa-erro").classList.add("oculto");
+  if (aguardandoJustificativa) document.getElementById("justificativa-texto").value = "";
   try { new Audio(status === "ATRASADO"
     ? "https://actions.google.com/sounds/v1/alarms/beep_short.ogg"
-    : (ok ? "https://actions.google.com/sounds/v1/cartoons/pling.ogg"
+    : (r.ok ? "https://actions.google.com/sounds/v1/cartoons/pling.ogg"
     : "https://actions.google.com/sounds/v1/cartoons/bugle_tune.ogg")).play();
   } catch (e) {}
   setTimeout(() => res.classList.add("oculto"), 4000);
@@ -38,15 +77,38 @@ async function validar(texto) {
       body: JSON.stringify({ token: texto })
     });
     const r = await resposta.json();
-    mostrar(r.ok, r.msg || "Validação concluída.", r.status);
+    mostrar(r);
     statusEl.textContent = "Câmera ativa. Pronto para a próxima leitura.";
   } catch (e) {
-    mostrar(false, "Falha ao validar. Confira a conexão com o servidor e tente novamente.");
+    mostrar({ ok: false, status: "NEGADO", msg: "Falha ao validar. Confira a conexão com o servidor e tente novamente." });
     statusEl.textContent = "Câmera ativa, mas o servidor não respondeu.";
   } finally {
-    setTimeout(() => { processando = false; }, 1800);
+    if (!aguardandoJustificativa) setTimeout(() => { processando = false; }, 1800);
   }
 }
+
+formularioJustificativa.addEventListener("submit", async e => {
+  e.preventDefault();
+  const botao = document.getElementById("justificativa-enviar");
+  const erro = document.getElementById("justificativa-erro");
+  botao.disabled = true;
+  erro.classList.add("oculto");
+  try {
+    const resposta = await fetch(`/api/registros/${registroJustificativa}/justificativa`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ justificativa: document.getElementById("justificativa-texto").value })
+    });
+    const dados = await resposta.json();
+    if (!resposta.ok) throw new Error(dados.msg || "Não foi possível salvar a justificativa.");
+    formularioJustificativa.classList.add("oculto");
+    document.getElementById("justificativa-salva").classList.remove("oculto");
+    aguardandoJustificativa = false;
+    setTimeout(() => { processando = false; }, 1800);
+  } catch (falha) {
+    erro.textContent = falha.message;
+    erro.classList.remove("oculto");
+  } finally { botao.disabled = false; }
+});
 
 async function iniciarScanner() {
   if (!navigator.mediaDevices?.getUserMedia) {

@@ -1,24 +1,60 @@
 {% extends "base.html" %}
 {% block conteudo %}
-<h1>📊 Dashboard</h1>
-<div class="grid-stats">
-  <div class="card stat"><b>{{ stats.total_alunos }}</b><span>Alunos</span></div>
-  <div class="card stat verde"><b>{{ stats.entradas_hoje }}</b><span>Entradas hoje</span></div>
-  <div class="card stat azul"><b>{{ stats.saidas_hoje }}</b><span>Saídas hoje</span></div>
-  <div class="card stat vermelho"><b>{{ stats.negados_hoje }}</b><span>Negados hoje</span></div>
-  <div class="card stat laranja"><b>{{ stats.atrasos_hoje }}</b><span>Atrasos hoje</span></div>
+<div class="dashboard-heading">
+  <div><h1>Olá, Admin!</h1><p>Confira o resumo das atividades da escola hoje.</p></div>
+  <a class="dashboard-all-link" href="/registros">Ver todos os registros <span aria-hidden="true">→</span></a>
 </div>
-<h2>Últimos acessos</h2>
-<table>
-  <tr><th>Aluno</th><th>Tipo</th><th>Status</th><th>Data/Hora</th></tr>
-  {% for r in ultimos %}
-  <tr>
-    <td>{{ r.nome }}</td><td>{{ r.tipo }}</td>
-    <td class="{{ 'verde' if r.status=='AUTORIZADO' else ('laranja' if r.status=='ATRASADO' else 'vermelho') }}">{{ r.status }}</td>
-    <td>{{ r.dh }}</td>
-  </tr>
-  {% else %}
-  <tr><td colspan="4">Nenhum acesso ainda.</td></tr>
-  {% endfor %}
-</table>
+<div class="dashboard-layout">
+  <section class="dashboard-main" aria-label="Resumo da escola">
+    <div class="grid-stats">
+      <a class="card stat" href="/alunos"><span class="stat-icon" aria-hidden="true">♧</span><span>Alunos cadastrados</span><b>{{ stats.total_alunos }}</b><span class="card-hint">Ver detalhes →</span></a>
+      <a class="card stat verde" href="/registros?tipo=ENTRADA"><span class="stat-icon" aria-hidden="true">→</span><span>Entradas hoje</span><b>{{ stats.entradas_hoje }}</b><span class="card-hint">Ver detalhes →</span></a>
+      <a class="card stat azul" href="/registros?tipo=SAIDA"><span class="stat-icon" aria-hidden="true">←</span><span>Saídas hoje</span><b>{{ stats.saidas_hoje }}</b><span class="card-hint">Ver detalhes →</span></a>
+      <a class="card stat vermelho" href="/registros?status=NEGADO"><span class="stat-icon" aria-hidden="true">!</span><span>Acessos negados</span><b>{{ stats.negados_hoje }}</b><span class="card-hint">Ver detalhes →</span></a>
+      <a class="card stat laranja" href="/registros?status=ATRASADO"><span class="stat-icon" aria-hidden="true">◷</span><span>Atrasos hoje</span><b>{{ stats.atrasos_hoje }}</b><span class="card-hint">Ver detalhes →</span></a>
+    </div>
+    <section class="card access-card">
+      <div class="section-heading"><h2><span aria-hidden="true">◷</span> Últimos acessos</h2><a href="/registros">Ver todos →</a></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Aluno</th><th>Tipo</th><th>Status</th><th>Data/Hora</th></tr></thead>
+        <tbody>
+          {% for r in ultimos %}
+          <tr>
+            <td>{{ r.nome }}</td><td>{{ 'Saída' if r.tipo == 'SAIDA' else 'Entrada' }}</td>
+            <td class="{{ 'verde' if r.status=='AUTORIZADO' else ('laranja' if r.status=='ATRASADO' else 'vermelho') }}">{{ r.status }}</td>
+            <td>{{ r.dh }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" class="empty-state">Nenhum acesso ainda.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table></div>
+    </section>
+    <div class="security-banner"><span class="security-icon" aria-hidden="true">◇</span><div><strong>Segurança e controle</strong><p>Tecnologia e cuidado para um ambiente escolar mais seguro.</p></div><span class="banner-school" aria-hidden="true">▥</span></div>
+  </section>
+  <aside class="dashboard-aside">
+    <section class="card attention-card">
+      <h2><span class="attention-icon" aria-hidden="true">!</span> Atenção</h2>
+      <div class="attention-list">
+        {% set alertas = namespace(total=0) %}
+        {% for r in ultimos if r.status in ['NEGADO', 'ATRASADO'] %}
+          {% if alertas.total < 3 %}
+          <a class="attention-item" href="/registros?status={{ r.status }}">
+            <span class="attention-item-icon" aria-hidden="true">{{ '!' if r.status == 'NEGADO' else '◷' }}</span>
+            <span><strong>{{ 'Acesso não autorizado' if r.status == 'NEGADO' else 'Acesso atrasado' }}</strong><small>{{ r.nome }} · {{ r.dh }}</small></span>
+          </a>
+          {% endif %}
+          {% set alertas.total = alertas.total + 1 %}
+        {% endfor %}
+        {% if alertas.total == 0 %}<p class="attention-empty">Nenhum alerta recente.</p>{% endif %}
+      </div>
+    </section>
+    <section class="card quick-actions">
+      <h2><span class="attention-icon" aria-hidden="true">ϟ</span> Ações rápidas</h2>
+      <a href="/alunos" class="quick-action"><span aria-hidden="true">♧</span><strong>Cadastrar aluno</strong></a>
+      <a href="/scanner" class="quick-action"><span aria-hidden="true">⌗</span><strong>Abrir scanner</strong></a>
+      <a href="/registros" class="quick-action"><span aria-hidden="true">▤</span><strong>Ver registros</strong></a>
+    </section>
+  </aside>
+</div>
 {% endblock %}

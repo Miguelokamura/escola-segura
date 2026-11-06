@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<h1>Cadastro de Professores</h1>
+<section class="card form-card" id="form-professor">
+  <div class="form-heading">
+    <div><span class="form-kicker">ACESSO DOCENTE</span><h2>{{ "Editar perfil do professor" if professor_id else "Novo professor" }}</h2></div>
+    <p>{{ "Atualize os dados e as turmas vinculadas ao professor." if professor_id else "Crie o acesso e vincule as turmas que o professor poderá acompanhar." }}</p>
+  </div>
+  {% if erro %}<p class="erro" role="alert">{{ erro }}</p>{% endif %}
+  {% if sucesso %}<p class="mensagem" role="status">{{ sucesso }}</p>{% endif %}
+  <form class="teacher-form" method="POST">
+    <input type="hidden" name="professor_id" value="{{ professor_id }}">
+    <div class="form-field"><label for="professor-nome">Nome completo</label><input id="professor-nome" name="nome" value="{{ nome_form }}" minlength="3" maxlength="120" autocomplete="name" required></div>
+    <div class="form-field"><label for="professor-usuario">Usuário de acesso</label><input id="professor-usuario" name="usuario" value="{{ usuario_form }}" minlength="3" maxlength="50" autocomplete="username" required></div>
+    {% if not professor_id %}
+    <div class="form-field"><label for="professor-senha">Senha inicial</label><input id="professor-senha" name="senha" type="password" value="{{ senha_form }}" minlength="8" maxlength="128" autocomplete="new-password" required><small>Mínimo de 8 caracteres.</small></div>
+    {% endif %}
+    <fieldset class="teacher-classes">
+      <legend>Turmas vinculadas</legend>
+      {% for sala in turmas %}
+      <label><input type="checkbox" name="turmas" value="{{ sala.turma }}" {% if sala.turma in turmas_selecionadas %}checked{% endif %}>{{ sala.turma }}</label>
+      {% else %}
+      <p>Nenhuma turma cadastrada nos alunos.</p>
+      {% endfor %}
+    </fieldset>
+    <div class="form-actions">
+      <button type="submit" {% if not turmas %}disabled{% endif %}>{{ "Salvar alterações" if professor_id else "Cadastrar professor" }}</button>
+      {% if professor_id %}<a class="button-secondary cancel-edit-link" href="{{ url_for('pagina_professores') }}">Cancelar</a>{% endif %}
+    </div>
+  </form>
+</section>
+<section class="card teacher-list">
+  <div class="list-heading"><div><h2>Professores cadastrados</h2><p>{{ professores|length }} professor(es)</p></div></div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Nome</th><th>Usuário</th><th>Turmas</th><th>Status</th><th>Ações</th></tr></thead>
+    <tbody>{% for professor in professores %}
+      <tr>
+        <td>{{ professor.nome }}</td><td>{{ professor.usuario }}</td><td>{{ professor.turmas or "—" }}</td>
+        <td class="{{ 'verde' if professor.ativo else 'vermelho' }}">{{ "Ativo" if professor.ativo else "Inativo" }}</td>
+        <td class="actions-cell">
+          <a class="mini button-secondary button-edit" href="{{ url_for('pagina_professores', editar=professor.id) }}#form-professor">Editar</a>
+          <form class="inline-action-form" method="POST" action="{{ url_for('alternar_professor', professor_id=professor.id) }}" onsubmit="return confirm('{{ 'Desativar este perfil? O professor perderá o acesso à aplicação.' if professor.ativo else 'Ativar este perfil?' }}')">
+            <button class="mini {{ 'button-deactivate' if professor.ativo else 'button-success' }}" type="submit">{{ "Desativar" if professor.ativo else "Ativar" }}</button>
+          </form>
+          <form class="inline-action-form" method="POST" action="{{ url_for('excluir_professor', professor_id=professor.id) }}" onsubmit="return confirm('Excluir permanentemente este perfil? Esta ação não pode ser desfeita.')">
+            <button class="mini button-danger" type="submit">Excluir</button>
+          </form>
+        </td>
+      </tr>
+    {% else %}
+      <tr><td class="empty-state" colspan="5">Nenhum professor cadastrado.</td></tr>
+    {% endfor %}</tbody>
+  </table></div>
+</section>
+{% endblock %}

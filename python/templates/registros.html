@@ -1,16 +1,22 @@
 {% extends "base.html" %}
 {% block conteudo %}
-<h1>📜 Histórico de Acessos</h1>
-<button onclick="carregar()">🔄 Atualizar</button>
-<p class="dica">Atualiza automaticamente a cada 10 segundos.</p>
-<table id="tabela-registros">
-  <tr><th>Aluno</th><th>Turma</th><th>Tipo</th><th>Método</th>
-      <th>Status</th><th>Atraso</th><th>Data/Hora</th></tr>
-</table>
+<div class="page-title-row"><div><h1>Histórico de Acessos</h1><p>Atualiza automaticamente a cada 10 segundos.</p></div><button class="button-secondary" onclick="carregar()">Atualizar</button></div>
+<section class="card filters-card" aria-label="Filtros dos registros">
+  <label>Tipo de acesso<select id="filtro-tipo"><option value="TODOS">Entradas e saídas</option><option value="ENTRADA">Somente entradas</option><option value="SAIDA">Somente saídas</option></select></label>
+  <label>Status<select id="filtro-status"><option value="TODOS">Todos os status</option><option value="ATRASADO">Atrasados</option><option value="NEGADO">Negados</option><option value="AUTORIZADO">Autorizados</option></select></label>
+  <button class="clear-filters" id="limpar-filtros" hidden>Limpar filtros</button>
+</section>
+<div class="records-grid"><section class="records-section" id="secao-entradas"><h2>Entradas <span class="count-badge" id="qtd-entradas">0</span></h2><div class="table-wrap"><table id="tabela-entradas">
+  <tr><th>Aluno</th><th>Turma</th><th>Status</th><th>Método</th><th>Aulas de atraso</th><th>Justificativa</th><th>Data/Hora</th></tr>
+</table></div></section><section class="records-section" id="secao-saidas"><h2>Saídas <span class="count-badge" id="qtd-saidas">0</span></h2><div class="table-wrap"><table id="tabela-saidas">
+  <tr><th>Aluno</th><th>Turma</th><th>Status</th><th>Método</th><th>Aulas de atraso</th><th>Justificativa</th><th>Data/Hora</th></tr>
+</table></div></section></div>
 {% endblock %}
 {% block scripts %}
 <script src="/static/js/app.js"></script>
 <script>
+document.getElementById("filtro-tipo").value = {{ tipo|tojson }};
+document.getElementById("filtro-status").value = {{ status|tojson }};
 carregar();
 setInterval(carregar, 10000);
 </script>

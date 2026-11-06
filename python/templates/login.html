@@ -1,12 +1,28 @@
 {% extends "base.html" %}
 {% block conteudo %}
-<div class="card login-box">
-  <h2>🔐 EscolaSegura</h2>
-  {% if erro %}<p class="erro">{{ erro }}</p>{% endif %}
-  <form method="POST">
-    <input name="usuario" placeholder="Usuário" required>
-    <input name="senha" type="password" placeholder="Senha" required>
-    <button type="submit">Entrar</button>
-  </form>
+<div class="login-layout">
+  <section class="login-copy">
+    <h1>Mais segurança para nossa escola</h1>
+    <ul class="login-benefits">
+      <li><span aria-hidden="true">◇</span> Controle de acesso com tecnologia</li>
+      <li><span aria-hidden="true">♧</span> Mais proteção para alunos e equipe</li>
+      <li><span aria-hidden="true">▣</span> Um ambiente escolar mais seguro</li>
+    </ul>
+  </section>
+  <div class="card login-box">
+    <div class="login-box-brand">
+      <img src="{{ url_for('static', filename='images/logo-safe-school.png') }}" alt="">
+      <span>S.A.F.E School</span>
+    </div>
+    <h2>Acesse sua conta</h2>
+    {% if erro %}<p class="erro" role="alert">{{ erro }}</p>{% endif %}
+    <form method="POST">
+      <label for="login-usuario">Usuário</label>
+      <input id="login-usuario" name="usuario" placeholder="Digite seu usuário" autocomplete="username" required>
+      <label for="login-senha">Senha</label>
+      <input id="login-senha" name="senha" type="password" placeholder="Digite sua senha" autocomplete="current-password" required>
+      <button type="submit">Entrar</button>
+    </form>
+  </div>
 </div>
 {% endblock %}

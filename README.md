@@ -40,12 +40,7 @@ Abra o Expo Go no celular e leia o QR Code exibido. A tarefa **React: iniciar AP
 
 ## Credenciais locais do React
 
-Para facilitar o desenvolvimento, o login React também aceita as credenciais visíveis em `react/server/credentials.js`:
-
-- Usuário: `admin`
-- Senha: `admin123`
-
-Edite esse arquivo e reinicie a tarefa **React: iniciar API** para trocar os valores.
+O login da interface React usa os administradores cadastrados no banco. Configure as credenciais necessárias ao app móvel em variáveis de ambiente no arquivo local `react/server/.env`; não grave senhas no código.
 =======
 Sistema de segurança
 >>>>>>> c4957d8eb62304e5f0ce80e7754ec738364f447d

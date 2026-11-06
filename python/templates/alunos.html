@@ -1,31 +1,81 @@
 {% extends "base.html" %}
 {% block conteudo %}
-<h1>👨‍🎓 Gestão de Alunos</h1>
-<div class="card">
-  <h3 id="titulo-form">Novo Aluno</h3>
-  <p class="dica">Os campos marcados com * são obrigatórios.</p>
+<h1>Gestão de Alunos</h1>
+<div class="card form-card">
+  <div class="form-heading">
+    <div><span class="form-kicker">CADASTRO ESCOLAR</span><h2 id="titulo-form">Cadastrar aluno</h2></div>
+    <p>Preencha os dados para manter o controle de acesso atualizado.</p>
+  </div>
   <div id="mensagem-aluno" class="mensagem oculto" role="status" aria-live="polite"></div>
-  <form id="form-aluno">
+  <p class="required-note"><span aria-hidden="true">*</span> Campos obrigatórios</p>
+  <form id="form-aluno" class="student-form">
     <input type="hidden" id="aluno-id">
-    <label for="f-nome">Nome completo *</label>
-    <input id="f-nome" placeholder="Nome completo" minlength="3" maxlength="120" required>
-    <label for="f-matricula">Matrícula *</label>
-    <input id="f-matricula" placeholder="Matrícula" maxlength="30" required>
-    <label for="f-turma">Turma</label>
-    <input id="f-turma" placeholder="Turma" maxlength="60">
-    <label for="f-responsavel">Responsável</label>
-    <input id="f-responsavel" placeholder="Nome do responsável" maxlength="120">
-    <label for="f-telefone">Telefone</label>
-    <input id="f-telefone" type="tel" placeholder="(00) 00000-0000" maxlength="20">
-    <button type="submit">Salvar</button>
-    <button type="button" id="btn-cancelar" hidden>Cancelar</button>
+    <div class="form-section-title"><h3>Dados do aluno</h3><p>Informações para identificar o estudante.</p></div>
+    <div class="form-field"><label for="f-nome">Nome completo <span>*</span></label><input id="f-nome" placeholder="Ex.: Ana Souza" autocomplete="name" minlength="3" maxlength="120" required></div>
+    <div class="form-field"><label for="f-matricula">RM / Matrícula <span>*</span></label><input id="f-matricula" placeholder="Número de matrícula" maxlength="30" required></div>
+    <div class="form-field"><label for="f-turma">Ano escolar <span>*</span></label>
+      <select id="f-turma" required>
+        <option value="">Selecione o ano escolar</option>
+        <optgroup label="Ensino Fundamental">
+          {% for ano in range(1, 10) %}<option value="{{ ano }}º ano do Ensino Fundamental">{{ ano }}º ano</option>{% endfor %}
+        </optgroup>
+        <optgroup label="Ensino Médio">
+          {% for ano in range(1, 4) %}<option value="{{ ano }}º ano do Ensino Médio">{{ ano }}º ano</option>{% endfor %}
+        </optgroup>
+      </select>
+    </div>
+    <div class="form-field" id="campo-sala" hidden>
+      <label for="f-sala">Sala <span>*</span></label>
+      <select id="f-sala">
+        <option value="">Selecione a sala</option>
+        <option value="A">Sala A</option>
+        <option value="B">Sala B</option>
+      </select>
+    </div>
+    <div class="form-field" id="campo-curso-tecnico" hidden>
+      <label for="f-curso-tecnico">Curso técnico <span>*</span></label>
+      <select id="f-curso-tecnico">
+        <option value="">Selecione o curso técnico</option>
+        <option>Administração</option><option>Agroindústria</option><option>Alimentos</option>
+        <option>Análises Químicas</option><option>Análise e Desenvolvimento de Sistemas (ADS)</option>
+        <option>Automação Industrial</option>
+        <option>Biotecnologia</option><option>Calçados</option><option>Celulose e Papel</option>
+        <option>Cerâmica</option><option>Cervejaria</option><option>Comunicação Visual</option>
+        <option>Comércio Exterior</option><option>Construção Naval</option>
+        <option>Desenho de Construção Civil</option><option>Desenvolvimento de Sistemas</option>
+        <option>Design de Calçados</option><option>Design Gráfico</option>
+        <option>Edificações</option><option>Eletroeletrônica</option><option>Eletromecânica</option>
+        <option>Eletrônica</option><option>Eletrotécnica</option><option>Fabricação Mecânica</option>
+        <option>Farmácia</option><option>Finanças</option><option>Impressão Offset</option>
+        <option>Informática</option><option>Instrumentação Industrial</option>
+        <option>Jogos Digitais</option><option>Logística</option><option>Manutenção Aeronáutica</option>
+        <option>Manutenção Automotiva</option>
+        <option>Manutenção de Máquinas Industriais</option><option>Manutenção de Máquinas Pesadas</option>
+        <option>Mecânica</option><option>Mecatrônica</option><option>Meio Ambiente</option>
+        <option>Mineração</option><option>Modelagem do Vestuário</option><option>Multimídia</option>
+        <option>Nutrição e Dietética</option><option>Panificação</option><option>Petróleo e Gás</option>
+        <option>Produção de Áudio e Vídeo</option>
+        <option>Plásticos</option><option>Portos</option><option>Química</option>
+        <option>Qualidade</option><option>Redes de Computadores</option>
+        <option>Refrigeração e Climatização</option><option>Saneamento</option>
+        <option>Segurança do Trabalho</option><option>Soldagem</option>
+        <option>Sistemas de Energia Renovável</option><option>Telecomunicações</option>
+        <option>Têxtil</option><option>Vestuário</option>
+      </select>
+    </div>
+    <div class="form-section-title"><h3>Contato do responsável</h3><p>Use os dados de quem a escola deve contatar.</p></div>
+    <div class="form-field"><label for="f-responsavel">Nome do responsável <span>*</span></label><input id="f-responsavel" placeholder="Nome completo" autocomplete="name" maxlength="120" required></div>
+    <div class="form-field"><label for="f-telefone">Telefone do responsável <span>*</span></label><input id="f-telefone" type="tel" placeholder="(11) 91234-5678" autocomplete="tel" maxlength="20" required></div>
+    <div class="form-actions"><button id="btn-salvar-aluno" type="submit">Cadastrar aluno</button>
+    <button class="button-secondary" type="button" id="btn-cancelar" hidden>Cancelar</button></div>
   </form>
 </div>
-<h2>Alunos cadastrados</h2>
-<table id="tabela-alunos">
-  <tr><th>Nome</th><th>Matrícula</th><th>Turma</th>
+<section class="list-heading"><div><h2>Alunos cadastrados</h2><p id="contagem-alunos"></p></div>
+<input class="search-input" id="busca-alunos" type="search" placeholder="Buscar por nome ou RM" aria-label="Buscar aluno por nome ou RM"></section>
+<div class="table-wrap"><table id="tabela-alunos" class="students-table">
+  <tr><th>Nome</th><th>Matrícula</th><th>Ano escolar / Curso técnico</th>
       <th>Status</th><th>QR Code</th><th>Ações</th></tr>
-</table>
+</table></div>
 {% endblock %}
 {% block scripts %}
 <script src="/static/js/app.js"></script>
