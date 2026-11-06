@@ -17,6 +17,7 @@ DB_CONFIG = {
     "password": os.getenv("DB_PASSWORD", ""),
     "database": os.getenv("DB_NAME", "escola_segura"),
     "charset": "utf8mb4",
+    "connection_timeout": int(os.getenv("DB_CONNECT_TIMEOUT", "5")),
 }
 
 db_host = DB_CONFIG["host"]

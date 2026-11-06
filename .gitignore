@@ -7,3 +7,5 @@ react/server/.env
 **/.env
 ca.pem
 *.pem
+__pycache__/
+*.py[cod]

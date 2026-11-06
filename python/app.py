@@ -23,6 +23,13 @@ if not SECRET_KEY:
     raise RuntimeError("Defina SECRET_KEY no ambiente antes de iniciar o Flask.")
 app.secret_key = SECRET_KEY
 
+
+@app.errorhandler(mysql.connector.Error)
+def handle_database_error(error):
+    app.logger.exception("Falha ao acessar o banco de dados.", exc_info=error)
+    return "Não foi possível acessar o banco agora. Verifique a conexão e tente novamente.", 503
+
+
 @app.get("/ping")
 def ping():
     return jsonify({"ok": True})
@@ -695,4 +702,5 @@ def api_registros():
 
 if __name__ == "__main__":
     # Aceita acesso por localhost e pela rede local, sem depender de um IP fixo.
-    app.run(debug=True, host="0.0.0.0")
+    debug = os.getenv("FLASK_DEBUG", "").strip().lower() in {"1", "true", "yes"}
+    app.run(debug=debug, host="0.0.0.0")

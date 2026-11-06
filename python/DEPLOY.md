@@ -16,6 +16,8 @@
 
 As credenciais anteriores devem ser tratadas como comprometidas: redefina a senha no painel Aiven (**Reset password**) e atualize apenas o `.env` local e as variáveis do serviço Render/Express. Não reescreva o histórico Git; a rotação da senha invalida o segredo antigo. Não envie credenciais por chat nem as grave no Git.
 
+Se o Flask alcançar o host/porta, mas o handshake do MySQL expirar, confirme no painel Aiven que o serviço está ativo, que o endpoint e a porta correspondem ao serviço e que o acesso público/IP está permitido. O Flask limita a tentativa de conexão com `DB_CONNECT_TIMEOUT` (5 segundos por padrão); isso evita esperas longas, mas não corrige indisponibilidade ou bloqueio de rede.
+
 ## Render
 
 O `render.yaml` prepara um Web Service Flask, usando `python/` como diretório raiz. No Render, conecte o repositório e crie o serviço pelo Blueprint:
