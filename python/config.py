@@ -8,7 +8,7 @@ import tempfile
 from dotenv import load_dotenv
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-load_dotenv(PROJECT_ROOT / ".env", override=False)
+load_dotenv(Path(__file__).with_name(".env"), override=False)
 
 DB_CONFIG = {
     "host": os.getenv("DB_HOST", "127.0.0.1"),

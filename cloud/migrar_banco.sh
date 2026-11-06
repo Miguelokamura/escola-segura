@@ -2,7 +2,8 @@
 set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-ENV_FILE="$SCRIPT_DIR/.env"
+PROJECT_ROOT="$(cd -- "$SCRIPT_DIR/.." && pwd)"
+ENV_FILE="$PROJECT_ROOT/.env"
 
 if [[ ! -f "$ENV_FILE" ]]; then
   printf 'Arquivo .env não encontrado: %s\n' "$ENV_FILE" >&2
@@ -42,7 +43,7 @@ fi
 
 case "$AIVEN_CA" in
   /*) ;;
-  * ) AIVEN_CA="$SCRIPT_DIR/$AIVEN_CA" ;;
+  *) AIVEN_CA="$PROJECT_ROOT/$AIVEN_CA" ;;
 esac
 if [[ ! -f "$AIVEN_CA" ]]; then
   printf 'Certificado CA não encontrado: %s (verifique DB_SSL_CA no .env).\n' "$AIVEN_CA" >&2
